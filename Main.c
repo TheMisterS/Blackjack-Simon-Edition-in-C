@@ -33,6 +33,9 @@ void initialiseDeck(Deck *deck);
 void shuffle(Deck *deck);
 Card getTopCard(Deck *deck, int unusedCards);
 void print_card(Card);
+int dealer_hand_value;
+int player_hand_value;
+char input_index;
 
 int main(){
 //variables
@@ -55,16 +58,23 @@ char *start_text ="Hello and welcome";
 puts(start_text);
 //printf("Press any key if you wish to play\n");
 //getch();
-
+con_clear();
 printf("The dealers cards:\n");
 print_card(getTopCard(&play_deck,  play_deck.unusedCards));
 printf("XX\n");
 printf("Your cards: \n");
 print_card(getTopCard(&play_deck,  play_deck.unusedCards));
 print_card(getTopCard(&play_deck,  play_deck.unusedCards));
+
 printf("Do you wish to Hit or Stand? Press (H/S)\n");
-input_char_temp = getch();
-printf("%c",input_char_temp);
+scanf("\n%c",&input_char_temp);
+
+while((input_char_temp != 'h') && (input_char_temp != 's') && (input_char_temp != 'S') && (input_char_temp != 'H')){
+    printf("You have entered an incorrect value, please try again! \n");
+    printf("Do you wish to Hit or Stand? Press (H/S)\n");
+    scanf("\n%c",&input_char_temp);
+}
+
 
 
 return 0;
