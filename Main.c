@@ -33,15 +33,18 @@ void initialiseDeck(Deck *deck);
 void shuffle(Deck *deck);
 Card getTopCard(Deck *deck, int unusedCards);
 void print_card(Card);
-int dealer_hand_value;
-int player_hand_value;
-char input_index;
+int dealer_hand_value = 0;
+int player_hand_value = 0;
+Card index_card;
+Card first_dealer_card;
+Card second_dealer_card;
 
 int main(){
 //variables
 Deck play_deck;
-char input_char_temp;
+char *input_char_temp = (char*)calloc(50, sizeof(char));
 //TEST
+srand(time(NULL));
 initialiseDeck(&play_deck);
 shuffle(&play_deck);
 for(int i = 0; i < 52;++i){
@@ -54,29 +57,65 @@ printf("%d", y.valuee);
 printf("%c\n", y.suit);
 
 //GAME
+
 char *start_text ="Hello and welcome";
 puts(start_text);
 //printf("Press any key if you wish to play\n");
 //getch();
 con_clear();
 printf("The dealers cards:\n");
-print_card(getTopCard(&play_deck,  play_deck.unusedCards));
+first_dealer_card = getTopCard(&play_deck,  play_deck.unusedCards);
+second_dealer_card = getTopCard(&play_deck,  play_deck.unusedCards);
+dealer_hand_value += first_dealer_card.valuee + second_dealer_card.valuee ;
+print_card(first_dealer_card);
 printf("XX\n");
+printf("Dealers hand value is: %d\n", dealer_hand_value);
+
 printf("Your cards: \n");
-print_card(getTopCard(&play_deck,  play_deck.unusedCards));
-print_card(getTopCard(&play_deck,  play_deck.unusedCards));
+index_card = getTopCard(&play_deck,  play_deck.unusedCards);
+print_card(index_card);
+player_hand_value += index_card.valuee;
+index_card = getTopCard(&play_deck,  play_deck.unusedCards);
+player_hand_value += index_card.valuee;
+print_card(index_card);
+printf("Players hand value is: %d\n", player_hand_value);
+// zaidimo flagas ar toliau zaist laikinas
 
+while(1){
 printf("Do you wish to Hit or Stand? Press (H/S)\n");
-scanf("\n%c",&input_char_temp);
+fgets(input_char_temp,50,stdin);
 
-while((input_char_temp != 'h') && (input_char_temp != 's') && (input_char_temp != 'S') && (input_char_temp != 'H')){
+while((*input_char_temp != 'h') && (*input_char_temp != 's') && (*input_char_temp != 'S') && (*input_char_temp != 'H')){
     printf("You have entered an incorrect value, please try again! \n");
     printf("Do you wish to Hit or Stand? Press (H/S)\n");
-    scanf("\n%c",&input_char_temp);
+    fgets(input_char_temp,50,stdin);
 }
 
+if(*input_char_temp == 'h' || *input_char_temp == 'H'){
+    printf("The card you pulled is: \n");
+    index_card = getTopCard(&play_deck,  play_deck.unusedCards);
+    print_card(index_card);
+    player_hand_value += index_card.valuee;
+    printf("Players hand value is: %d\n", player_hand_value);
+    if(player_hand_value == 21){
+        printf("You've got a Blackjack, now it's the dealers turn to hit!\n");
+        break;
+    }
+}else{
+break;
+}
+}
+printf("The dealers cards are: \n");
+print_card(first_dealer_card);
+print_card(second_dealer_card);
+printf("Dealers hand value is: %d\n", dealer_hand_value);
 
-
+while(dealer_hand_value < 17){
+    index_card = getTopCard(&play_deck,  play_deck.unusedCards);
+    print_card(index_card);
+    dealer_hand_value += index_card.valuee;
+}
+printf("Dealers hand value is: %d\n", dealer_hand_value);
 return 0;
 }
 
