@@ -10,11 +10,11 @@
 #define starting_balance 500
 
 //COMMENTS AND NOTES
-
 // 1-10 values are normal
 // 11 - is J, 12 is Q, 13 is K, 14 is A
-
 // ace can be 11 or 1
+
+
 
 //STRUCTS
 typedef struct card {
@@ -28,23 +28,39 @@ typedef struct deck {
     int unusedCards;
 }Deck;
 
+typedef struct player {
+Card *dealers_cards;
+int ace_count;
+int hand_value;
+int played_cards;
+}Player;
+
 //PROTOTYPES
 void initialiseDeck(Deck *deck);
+void initialise_player(Player *player);
 void shuffle(Deck *deck);
 Card getTopCard(Deck *deck, int unusedCards);
 void print_card(Card);
-int dealer_hand_value = 0;
-int player_hand_value = 0;
-Card index_card;
-Card first_dealer_card;
-Card second_dealer_card;
+int calculate_card_value(int card_value, Player *player);
+int calculate_card_value_special(int card_value);
+int count_card_sum(int value_first_card, int value_second_card, Player *player);
+
+
 
 int main(){
 //variables
+Player dealer;
+Player player;
+int game_state = 1;
+
 Deck play_deck;
 char *input_char_temp = (char*)calloc(50, sizeof(char));
+
 //TEST
 srand(time(NULL));
+initialise_player(&dealer);
+initialise_player(&player);
+
 initialiseDeck(&play_deck);
 shuffle(&play_deck);
 for(int i = 0; i < 52;++i){
@@ -63,70 +79,124 @@ puts(start_text);
 //printf("Press any key if you wish to play\n");
 //getch();
 con_clear();
-printf("The dealers cards:\n");
-first_dealer_card = getTopCard(&play_deck,  play_deck.unusedCards);
-second_dealer_card = getTopCard(&play_deck,  play_deck.unusedCards);
-dealer_hand_value += first_dealer_card.valuee + second_dealer_card.valuee ;
-print_card(first_dealer_card);
+
+
+
+
+
+
+
+
+
+printf("The dealer's cards:\n");
+dealer.dealers_cards[0] = getTopCard(&play_deck,  play_deck.unusedCards);
+dealer.dealers_cards[1] = getTopCard(&play_deck,  play_deck.unusedCards);
+dealer.hand_value = count_card_sum(calculate_card_value(dealer.dealers_cards[0].valuee, &dealer), calculate_card_value(dealer.dealers_cards[1].valuee, &dealer), &dealer);
+print_card(dealer.dealers_cards[0]);
 printf("XX\n");
-printf("Dealers hand value is: %d\n", dealer_hand_value);
+
+printf("Dealers hand value is: %d + X\n", calculate_card_value_special(dealer.dealers_cards[0].valuee));
+dealer.played_cards = 2;
+
 
 printf("Your cards: \n");
-index_card = getTopCard(&play_deck,  play_deck.unusedCards);
-print_card(index_card);
-player_hand_value += index_card.valuee;
-index_card = getTopCard(&play_deck,  play_deck.unusedCards);
-player_hand_value += index_card.valuee;
-print_card(index_card);
-printf("Players hand value is: %d\n", player_hand_value);
+player.dealers_cards[0] = getTopCard(&play_deck,  play_deck.unusedCards);
+print_card(player.dealers_cards[0]);
+player.dealers_cards[1] = getTopCard(&play_deck,  play_deck.unusedCards);
+player.hand_value = count_card_sum(calculate_card_value(player.dealers_cards[0].valuee, &player),calculate_card_value(player.dealers_cards[1].valuee, &player), &player);
+print_card(player.dealers_cards[1]);
+printf("Players hand value is: %d\n", player.hand_value);
+player.played_cards = 2;
 // zaidimo flagas ar toliau zaist laikinas
 
-while(1){
-printf("Do you wish to Hit or Stand? Press (H/S)\n");
-fgets(input_char_temp,50,stdin);
 
-while((*input_char_temp != 'h') && (*input_char_temp != 's') && (*input_char_temp != 'S') && (*input_char_temp != 'H')){
-    printf("You have entered an incorrect value, please try again! \n");
+
+
+
+
+
+
+
+
+
+if(player.hand_value == 21){
+    game_state = 0;
+}
+
+
+while(game_state > 0){
     printf("Do you wish to Hit or Stand? Press (H/S)\n");
     fgets(input_char_temp,50,stdin);
-}
 
-if(*input_char_temp == 'h' || *input_char_temp == 'H'){
-    printf("The card you pulled is: \n");
-    index_card = getTopCard(&play_deck,  play_deck.unusedCards);
-    print_card(index_card);
-    player_hand_value += index_card.valuee;
-    printf("Players hand value is: %d\n", player_hand_value);
-    if(player_hand_value == 21){
-        printf("You've got a Blackjack, now it's the dealers turn to hit!\n");
-        break;
+    while((*input_char_temp != 'h') && (*input_char_temp != 's') && (*input_char_temp != 'S') && (*input_char_temp != 'H')){
+        printf("You have entered an incorrect value, please try again! \n");
+        printf("Do you wish to Hit or Stand? Press (H/S)\n");
+        fgets(input_char_temp,50,stdin);
     }
-}else{
-break;
-}
-}
-printf("The dealers cards are: \n");
-print_card(first_dealer_card);
-print_card(second_dealer_card);
-printf("Dealers hand value is: %d\n", dealer_hand_value);
 
-while(dealer_hand_value < 17){
-    index_card = getTopCard(&play_deck,  play_deck.unusedCards);
-    print_card(index_card);
-    dealer_hand_value += index_card.valuee;
+    if(*input_char_temp == 'h' || *input_char_temp == 'H'){
+        printf("The card you pulled is: \n");
+        player.dealers_cards[player.played_cards] = getTopCard(&play_deck,  play_deck.unusedCards);
+        print_card(player.dealers_cards[player.played_cards]);
+        player.hand_value = count_card_sum(player.hand_value, calculate_card_value(player.dealers_cards[player.played_cards].valuee, &player), &player);
+        player.played_cards++;
+        printf("Players hand value is: %d\n", player.hand_value);
+        if(player.hand_value  == 21){
+            game_state = 0; //player blackjack state
+        }else if(player.hand_value > 21){
+            game_state = -1;//player lost state
+        }
+    }else{
+       game_state = -2; //player stayed state
+    }
 }
-printf("Dealers hand value is: %d\n", dealer_hand_value);
+
+while(game_state == 0 || game_state == -2){
+    while(dealer.hand_value < 17 && (game_state == 0 ||game_state == -2)){
+    dealer.dealers_cards[dealer.played_cards] = getTopCard(&play_deck,  play_deck.unusedCards);
+    print_card(dealer.dealers_cards[dealer.played_cards]);
+    dealer.hand_value = count_card_sum(dealer.hand_value,calculate_card_value(dealer.dealers_cards[dealer.played_cards].valuee, &dealer),&player);
+        if (dealer.hand_value > 21){
+           game_state = 2; //dealer overstepped = insta win for player
+        }else if(dealer.hand_value == 21){
+            game_state = 3; // dealer blackjack = insta lose for player
+        }
+    }
+    if(game_state != 2 && game_state != 3){
+        if(dealer.hand_value >= player.hand_value){
+            game_state = 4; //dealer wins bcus higher
+        }else if(dealer.hand_value < player.hand_value)
+            game_state = 5;
+    }
+
+
+}
+
+switch(game_state){
+    case -1:
+        printf("You LOST because you overstepped 21!\n");
+        break;
+    case 2:
+        printf("You WON because dealer overstepped 21!\n");
+        break;
+    case 3:
+        printf("Dealer WON because he got a BLACKJACK!\n");
+        break;
+    case 4:
+        printf("Dealer Wins because his hand value or equal to yours!\n");
+        break;
+    case 5:
+        printf("You WON!!!!!!!!\n");
+        break;
+
+
+
+
+
+}
+printf(" state is :%d", game_state);
 return 0;
 }
-
-
-
-
-
-
-
-
-
 
 //Functions
 void initialiseDeck(Deck *deck){
@@ -176,10 +246,64 @@ return deck->card[deck ->unusedCards];
 }
 
 void print_card(Card top_card){
-    printf("%d%c\n",top_card.valuee, top_card.suit);
+    if(top_card.valuee == 11){
+        printf("J%c\n",top_card.suit);
+    }else if(top_card.valuee == 12){
+        printf("Q%c\n",top_card.suit);
+    }else if(top_card.valuee == 13){
+        printf("K%c\n",top_card.suit);
+    }else if(top_card.valuee == 14){
+        printf("A%c\n",top_card.suit);
+    }else{
+        printf("%d%c\n",top_card.valuee, top_card.suit);
+    }
 
 }
+int calculate_card_value(int card_value, Player *player){
+int value;
+if(card_value <= 10){
+    return card_value;
+}else if(card_value > 10 && card_value < 14){
+    value = 10;
+    return value;
+}else if(card_value == 14){
+player->ace_count += 1;
+return 11;
+}
+return 0;
+}
 
+int calculate_card_value_special(int card_value){
+int value;
+if(card_value <= 10){
+    return card_value;
+}else if(card_value > 10 && card_value < 14){
+    value = 10;
+    return value;
+}else if(card_value == 14){
+return 11;
+}
+return 0;
+}
+
+
+
+int count_card_sum(int value_first_card, int value_second_card, Player *player){
+int sum;
+sum = value_first_card + value_second_card;
+while(sum > 21 && player->ace_count > 0){
+    sum = sum - 10;
+    player->ace_count = player->ace_count - 1;
+}
+return sum;
+}
+
+void initialise_player(Player *player){
+player->ace_count = 0;
+player->hand_value = 0;
+player->played_cards = 0;
+player->dealers_cards = (Card*)calloc(decksize, sizeof(Card));
+}
 //Text Samples
 /*
 printf(" $$$$$$\\  $$\\                                   $$\\\n");
