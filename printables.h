@@ -2,6 +2,27 @@
 
 void print_intro_logo();
 
+
+char hit_stand[] = "Do you wish to Hit or Stand? Press (H/S)";
+char continue_playing[] = "Do you wish to continue playing? Press (Y/N)";
+char save_option[] = "Do you wish to save the game before exiting? (Y/N)!";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void print_intro_logo(){
 printf(" $$$$$$\\  $$\\                                   $$\\\n");
 printf("$$  __$$\\ \\__|                                  $  |\n");
@@ -17,7 +38,7 @@ printf("$$ |  $$ |$$ | $$$$$$\\   $$$$$$$\\ $$ |  $$\\       $$ | $$$$$$\\   $$$
 printf("$$$$$$$\\ |$$ | \\____$$\\ $$  _____|$$ | $$  |      $$ | \\____$$\\ $$  _____|$$ | $$  |\n");
 printf("$$  __$$\\ $$ | $$$$$$$ |$$ /      $$$$$$  / $$\\   $$ | $$$$$$$ |$$ /      $$$$$$  /\n");
 printf("$$ |  $$ |$$ |$$  __$$ |$$ |      $$  _$$<  $$ |  $$ |$$  __$$ |$$ |      $$  _$$<\n");
-printf("$$$$$$$  |$$ |\\$$$$$$$ |\\$$$$$$$\\ $$ | \\$$\\ \\$$$$$$  |\\$$$$$$$ |\\$$$$$$$\\ $$ | \$$\\\n");
+printf("$$$$$$$  |$$ |\\$$$$$$$ |\\$$$$$$$\\ $$ | \\$$\\ \\$$$$$$  |\\$$$$$$$ |\\$$$$$$$\\ $$ | \\$$\\\n");
 printf("\\_______/ \\__| \\_______| \\_______|\\__|  \\__| \\______/  \\_______| \\_______|\\__|  \\__|\n");
 printf("\n\n");
 printf("                            Welcome to SIMON'S BLACKJACK!\n");

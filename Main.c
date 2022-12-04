@@ -10,13 +10,6 @@
 #define decksize 52
 #define starting_balance 500
 
-//COMMENTS AND NOTES
-// 1-10 values are normal
-// 11 - is J, 12 is Q, 13 is K, 14 is A
-// ace can be 11 or 1
-
-
-
 //STRUCTS;
 typedef struct card {
     int valuee;
@@ -53,6 +46,7 @@ void load_save(int *player_balance,int *hands_played, FILE *save);
 
 
 int main(){
+
 //variables
 FILE *save;
 Player dealer;
@@ -70,14 +64,14 @@ char input_index;
 char hit_stand[] = "Do you wish to Hit or Stand? Press (H/S)";
 char continue_playing[] = "Do you wish to continue playing? Press (Y/N)";
 char save_option[] = "Do you wish to save the game before exiting? (Y/N)!";
+
 //TEST
 srand(time(NULL));
 initialise_player(&dealer);
 initialise_player(&player);
 initialiseDeck(&play_deck);
-//GAME
 
-//printf("Press any key if you wish to play\n");
+//GAME
 print_intro_logo();
 fgets(input_char_temp,50,stdin);
 while((*input_char_temp != 'R') && (*input_char_temp != 'r') && (*input_char_temp != 'S') && (*input_char_temp != 's') && (*input_char_temp != 'p') &&(*input_char_temp != 'P') ){
@@ -99,16 +93,15 @@ if(*input_char_temp == 'r' || *input_char_temp == 'R'){
 }
 
 
-
+//from here the game loops till the player does not want to play anymore.
 while(game_state == 1){
     shuffle(&play_deck);
 
 
-    printf("Hands played: %d\n",hands_played);
+    printf("Hands played: %d\n",hands_played); //Players played hand count,balance and current bet are displayed.
     printf("YOUR CURRENT BALANCE IS: %d\n", player_balance);
-    printf("YOUR BET:\n\n");
-    // fgets(input_char_temp,50,stdin);
-    //INSERT INT VALIDATION!!!!!!!!!!!!!!!!
+    printf("YOUR BET:%d\n", current_bet);
+    //INSERT INT VALIDATION!!!!!!!!!!!!!!!! AND CUSTOM BET = current_bet!!!!!!!!!!!!!!!!!!!!!!
 
     printf("The dealer's cards:\n"); //Dealer's first two cards are printed in this section, one face down(unknown to the player)
     dealer.dealers_cards[0] = getTopCard(&play_deck,  play_deck.unusedCards);
@@ -129,17 +122,17 @@ while(game_state == 1){
     print_card(player.dealers_cards[1]);
     printf("Players hand value is: %d\n", player.hand_value);
     player.played_cards = 2;
-    // zaidimo flagas ar toliau zaist laikinas
+
 
 
     if(player.hand_value == 21){  //If players gets a BJ the option to hit is skipped
         game_state = 0;
+        con_sleep(1);
     }
 
 
     while(game_state > 0){
-            //player is presented with the option to remain or to get another card
-            input_index = checkInput(hit_stand, 'h', 's');
+        input_index = checkInput(hit_stand, 'h', 's'); //player is presented with the option to remain or to get another card
         if(input_index == 'h' || input_index == 'H'){
             printf("The card you pulled is: \n");
             player.dealers_cards[player.played_cards] = getTopCard(&play_deck,  play_deck.unusedCards);
@@ -210,12 +203,12 @@ while(game_state == 1){
     }
 
 
-    input_index = checkInput(continue_playing, 'y', 'n');
+    input_index = checkInput(continue_playing, 'y', 'n'); // player is presented with the option to cotinue or not to continue the game
     printf("Your NEW balance is: %d\n", player_balance);
     if(input_index == 'y' || input_index == 'Y'){
         game_state = 1;
         con_clear();
-    }else if(input_index == 'n' || 'N'){
+    }else if(input_index == 'n' || 'N'){   // if player doesnt continue he may save the game
         game_state = -10;
         input_index = checkInput(save_option, 'y', 'n');
         if(input_index == 'y' || input_index == 'Y'){
@@ -223,22 +216,14 @@ while(game_state == 1){
         }
     }
 
-    hands_played++;
+    hands_played++;   //
     }
 
 
 
 return 0;
 }
-/////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
+//****************************************************************************************************************************************************************************************************
 
 //Functions
 void initialiseDeck(Deck *deck){
@@ -377,5 +362,4 @@ void load_save(int *player_balance,int *hands_played, FILE *save){
     fread(player_balance ,sizeof(int),1,save);
     fread(hands_played ,sizeof(int),1,save);
     fclose(save);
-
 }
